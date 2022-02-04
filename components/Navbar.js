@@ -30,25 +30,25 @@ export default function Navbar({ children }) {
         }`}
       >
         <div className="font-medium text-2xl">Noter</div>
-        <ul className="flex gap-3 text-xl items-center">
-          {[
-            ["Home", "/"],
-            ["Profile", "/profile"],
-          ].map(([text, href], i) => (
-            <li key={i}>
-              <Link href={href}>
-                <a>{text}</a>
-              </Link>
-            </li>
-          ))}
-          {user && (
+        {user && (
+          <ul className="flex gap-3 text-xl items-center">
+            {[
+              ["Home", "/"],
+              ["Profile", "/profile"],
+            ].map(([text, href], i) => (
+              <li key={i}>
+                <Link href={href}>
+                  <a>{text}</a>
+                </Link>
+              </li>
+            ))}
             <li>
               <button className="btn" onClick={handleUser}>
                 Sign Out
               </button>
             </li>
-          )}
-        </ul>
+          </ul>
+        )}
       </nav>
       <div
         className={`w-screen relative  ${
