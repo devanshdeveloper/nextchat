@@ -5,6 +5,7 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          <link rel="favicon" href="/notes.png" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
             rel="preconnect"

@@ -16,10 +16,9 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     onAuth((user) => {
-      if (user) {
-        setUser(user);
-        router.asPath === "/auth" && router.push("/");
-      } else router.push("/auth");
+      setUser(user);
+      if (user) router.asPath === "/auth" && router.push("/");
+      else router.push("/auth");
       setLoading(false);
     });
   }, []);

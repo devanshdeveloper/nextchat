@@ -3,6 +3,7 @@ import { Alert, FormInput, Loader } from "../components";
 import { createRef, useState } from "react";
 import { updateUser } from "../firebase";
 import { interpretError } from "../utilities";
+import Head from "next/head";
 
 export default function Profile() {
   // input refs
@@ -30,6 +31,9 @@ export default function Profile() {
 
   return (
     <>
+      <Head>
+        <title>Profile | Noter</title>
+      </Head>
       <div className="flex h-60 items-center justify-center">
         <img
           src={user.photoURL}

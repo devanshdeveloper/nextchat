@@ -1,9 +1,12 @@
 import { initializeApp } from "firebase/app";
+import { getStorage, uploadBytes, ref as storageRef } from "firebase/storage";
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithRedirect,
   signOut,
   updateEmail,
   updateProfile,
@@ -18,7 +21,7 @@ import {
   update,
 } from "firebase/database";
 import { getFormattedDate } from "../utilities";
-const firebaseConfig = {
+const app = initializeApp({
   apiKey: "AIzaSyC5yhbGuHEUQUkqGhqy8QDtQfhiC4wCRrg",
   authDomain: "noter-fcd0d.firebaseapp.com",
   databaseURL: "https://noter-fcd0d-default-rtdb.firebaseio.com",
@@ -27,10 +30,10 @@ const firebaseConfig = {
   messagingSenderId: "848405810237",
   appId: "1:848405810237:web:ee1fd1fbbdfeaa3cd22e54",
   measurementId: "G-EN1M9GKZ43",
-};
-const app = initializeApp(firebaseConfig);
+});
 const auth = getAuth();
 const db = getDatabase();
+const storage = getStorage(app);
 
 export function onAuth(func) {
   onAuthStateChanged(auth, (user) => {
@@ -56,9 +59,7 @@ export function createUser(email, pass, displayName) {
     if (!displayName) reject({ code: "auth/invalid-name" });
     createUserWithEmailAndPassword(auth, email, pass)
       .then(() =>
-        updateProfile(auth, { displayName })
-          .then(() => resolve())
-          .catch(reject)
+        updateProfile(auth, { displayName }).then(resolve).catch(reject)
       )
       .catch(reject);
   });
@@ -75,6 +76,9 @@ export function updateUser(displayName, email) {
   });
 }
 
+export function signUserIn() {
+  return signInWithRedirect(auth, new GoogleAuthProvider());
+}
 export function signUserOut() {
   return signOut(auth);
 }
@@ -85,7 +89,7 @@ export function getUser() {
   return auth.currentUser;
 }
 export function getUserId() {
-  return getUser().uid;
+  return getUser()?.uid;
 }
 export function addTodo(data) {
   return set(push(ref(db, `users/${getUserId()}/todos`)), data);
@@ -98,4 +102,13 @@ export function deleteTodo(id) {
 }
 export function toggleCompleted(id, completed) {
   return update(ref(db, `users/${getUserId()}/todos/${id}`), { completed });
+}
+// storage
+export function uploadPhotoURL(file) {
+  const filePath = `users/${getUserId()}/${file.name}`;
+  const imageRef = storageRef(storage, filePath);
+  uploadBytes(imageRef, file).then((s) => {
+    console.log(s);
+    updateProfile(getUser(), { photoURL: s.downloadURL });
+  });
 }

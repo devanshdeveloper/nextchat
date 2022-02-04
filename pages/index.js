@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { createRef, useEffect, useState } from "react";
 import { Loader, TodoList } from "../components";
 import { addTodo, onTodos } from "../firebase";
@@ -27,6 +28,9 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>Home | Noter</title>
+      </Head>
       <div>
         <h1 className="ml-3 pt-2 text-xl">Todos</h1>
         <TodoList todosData={todos}>

@@ -17,11 +17,6 @@ export default function Navbar({ children }) {
     if (isTop !== isScrolled) setIsScrolled(isTop);
   });
 
-  // functions
-  function handleUser() {
-    signUserOut();
-  }
-
   return (
     <>
       <nav
@@ -43,7 +38,10 @@ export default function Navbar({ children }) {
               </li>
             ))}
             <li>
-              <button className="btn" onClick={handleUser}>
+              <img src={user?.photoURL} className="rounded-full w-8" />
+            </li>
+            <li>
+              <button className="btn" onClick={signUserOut}>
                 Sign Out
               </button>
             </li>

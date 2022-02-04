@@ -1,12 +1,13 @@
+import Head from "next/head";
 import { useState } from "react";
 import { Alert, FormInput, Loader } from "../components";
-import { createUser, LogUserIn } from "../firebase";
+import { createUser, LogUserIn, signUserIn } from "../firebase";
 import { useToggle } from "../hooks";
 import { interpretError } from "../utilities";
 
 export default function UserForm() {
   // hooks
-  const [type, toggleType, isSignin] = useToggle("signin", "login");
+  const [type, toggleType, isSignin] = useToggle("Sign In", "Log In");
 
   // state
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export default function UserForm() {
     const { displayName, email, password } = formData;
     setLoading(true);
     (isSignin() ? createUser : LogUserIn)(email, password, displayName).catch(
-      (e) => setAlert({ message: interpretError(e.code), type: "error" })
+      handleError
     );
   }
 
@@ -32,13 +33,24 @@ export default function UserForm() {
     setFormData({ ...formData, [name]: value });
   }
 
+  function handleError(e) {
+    setAlert({ message: interpretError(e.code), type: "error" });
+  }
+
+  function handleSignin() {
+    signUserIn().catch(handleError);
+  }
+
   return (
     <>
+      <Head>
+        <title>{`${type} | Noter`}</title>
+      </Head>
       <div className="flex justify-center items-center h-[calc(100vh-48px)]">
-        <div className="w-[min(80vw,400px)] bg-white rounded-lg shadow-lg h-5/6 flex items-center justify-evenly flex-col">
-          <h1 className="text-2xl">{isSignin() ? "Sign In" : "Log In"}</h1>
+        <div className="w-[min(80vw,400px)] bg-white rounded-lg shadow-lg flex items-center justify-evenly flex-col p-4 gap-4">
+          <h1 className="text-2xl">{type}</h1>
           <Alert {...alert} />
-          <form onSubmit={handleSubmit} className="p-3">
+          <form onSubmit={handleSubmit}>
             {isSignin() && (
               <FormInput
                 onChange={handleChange}
@@ -77,9 +89,16 @@ export default function UserForm() {
           <div>
             {isSignin() ? "Already have an account?" : "Need an account?"}
             <span className="font-medium mx-1" onClick={toggleType}>
-              {isSignin() ? "Log In" : "Sign In"}
+              {type}
             </span>
           </div>
+          <button
+            onClick={handleSignin}
+            className="bg-white border-2 border-black flex gap-3 items-center px-3 py-2 rounded-md "
+          >
+            <img src="/google.svg" width={24} height={24} />
+            Continue With Google
+          </button>
         </div>
       </div>
       <Loader loading={loading} />
