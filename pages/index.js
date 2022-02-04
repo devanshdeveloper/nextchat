@@ -19,7 +19,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    onTodos((s) => {
+    return onTodos((s) => {
       if (s.exists()) setTodos(s.val());
       setLoading(false);
     });
