@@ -36,12 +36,12 @@ export default function Profile() {
           className="rounded-full w-[min(150px,50vw)] "
         />
       </div>
-      <div className="bg-white lg:w-1/3 w-2/3 rounded-md mx-auto">
+      <div className="bg-white lg:w-1/3 md:w-2/3 w-10/12 rounded-md mx-auto">
         <form
           onSubmit={handleSubmit}
           className="flex p-3 justify-center flex-col"
         >
-        <Alert {...alert} />
+          <Alert {...alert} />
           <FormInput
             ref={nameRef}
             labelText="Display Name"

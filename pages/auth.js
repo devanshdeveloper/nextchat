@@ -38,7 +38,7 @@ export default function UserForm() {
         <div className="w-[min(80vw,400px)] bg-white rounded-lg shadow-lg h-5/6 flex items-center justify-evenly flex-col">
           <h1 className="text-2xl">{isSignin() ? "Sign In" : "Log In"}</h1>
           <Alert {...alert} />
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="p-3">
             {isSignin() && (
               <FormInput
                 onChange={handleChange}
