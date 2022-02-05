@@ -44,7 +44,7 @@ export default function UserForm() {
   return (
     <>
       <Head>
-        <title>{`${type} | Noter`}</title>
+        <title>{`${type} | Chat App`}</title>
       </Head>
       <div className="flex justify-center items-center h-[calc(100vh-48px)]">
         <div className="w-[min(80vw,400px)] bg-white rounded-lg shadow-lg flex items-center justify-evenly flex-col p-4 gap-4">

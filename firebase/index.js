@@ -1,3 +1,5 @@
+const defaultPhotoURL =
+  "https://as2.ftcdn.net/v2/jpg/02/15/84/43/1000_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg";
 import { initializeApp } from "firebase/app";
 import { getStorage, uploadBytes, ref as storageRef } from "firebase/storage";
 import {
@@ -11,16 +13,8 @@ import {
   updateEmail,
   updateProfile,
 } from "firebase/auth";
-import {
-  getDatabase,
-  onValue,
-  push,
-  ref,
-  remove,
-  set,
-  update,
-} from "firebase/database";
-import { getFormattedDate } from "../utilities";
+import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import { getFormattedDate, randomMessage } from "../utilities";
 const app = initializeApp({
   apiKey: "AIzaSyC5yhbGuHEUQUkqGhqy8QDtQfhiC4wCRrg",
   authDomain: "noter-fcd0d.firebaseapp.com",
@@ -43,15 +37,13 @@ export function onAuth(func) {
       data = {
         ...user.providerData[0],
         ...user.metadata,
-        photoURL:
-          user.photoURL ||
-          "https://as2.ftcdn.net/v2/jpg/02/15/84/43/1000_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg",
+        photoURL: user.photoURL || defaultPhotoURL,
         firstName: nameInArray?.[0] || null,
         lastName: nameInArray?.[1] || null,
         joinedOn: getFormattedDate(user.metadata.creationTime),
       };
-    }
-    func(data);
+      addMessage(randomMessage()).then(() => func(data));
+    } else func(data);
   });
 }
 export function createUser(email, pass, displayName) {
@@ -91,24 +83,51 @@ export function getUser() {
 export function getUserId() {
   return getUser()?.uid;
 }
-export function addTodo(data) {
-  return set(push(ref(db, `users/${getUserId()}/todos`)), data);
+
+console.log(db);
+
+export function addMessage(text) {
+  return set(push(ref(db, `messages`)), {
+    text,
+    uid: getUserId(),
+    photoURL: getUser().photoURL || defaultPhotoURL,
+    displayName: getUser().displayName,
+    timestamp: Date.now(),
+  });
 }
-export function onTodos(then) {
-  return onValue(ref(db, `users/${getUserId()}/todos`), then);
+
+export function onMessages(then) {
+  return onValue(ref(db, `messages`), then);
 }
-export function deleteTodo(id) {
-  return remove(ref(db, `users/${getUserId()}/todos/${id}`));
-}
-export function toggleCompleted(id, completed) {
-  return update(ref(db, `users/${getUserId()}/todos/${id}`), { completed });
-}
+// export function addTodo(data) {
+//   return set(push(ref(db, `users/${getUserId()}/todos`)), data);
+// }
+// export function onTodos(then) {
+//   return onValue(ref(db, `users/${getUserId()}/todos`), then);
+// }
+// export function deleteTodo(id) {
+//   return remove(ref(db, `users/${getUserId()}/todos/${id}`));
+// }
+// export function toggleCompleted(id, completed) {
+//   return update(ref(db, `users/${getUserId()}/todos/${id}`), { completed });
+// }
 // storage
-export function uploadPhotoURL(file) {
-  const filePath = `users/${getUserId()}/${file.name}`;
-  const imageRef = storageRef(storage, filePath);
-  uploadBytes(imageRef, file).then((s) => {
-    console.log(s);
-    updateProfile(getUser(), { photoURL: s.downloadURL });
+
+export function uploadFile(path, file) {
+  return new Promise((resolve, reject) => {
+    uploadBytes(storageRef(storage, path), file)
+      .then((s) => resolve(s.downloadURL))
+      .catch(reject);
+  });
+}
+
+export function uploadUserPhoto(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) reject({ code: "storage/invalid-file" });
+    uploadFile(`users/${getUserId()}/profile`, file)
+      .then((url) =>
+        updateProfile(getUser(), { photoURL: url }).then(resolve).catch(reject)
+      )
+      .catch(reject);
   });
 }

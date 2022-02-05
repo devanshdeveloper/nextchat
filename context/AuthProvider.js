@@ -15,10 +15,10 @@ export default function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    onAuth((user) => {
+    return onAuth((user) => {
       setUser(user);
       if (user) router.asPath === "/auth" && router.push("/");
-      else router.push("/auth");
+      else router.asPath !== "/auth" && router.push("/landing");
       setLoading(false);
     });
   }, []);

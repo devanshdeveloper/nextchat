@@ -20,7 +20,7 @@ export default function Navbar({ children }) {
   return (
     <>
       <nav
-        className={`w-screen bg-white flex justify-around items-center fixed ${
+        className={`w-screen bg-white flex justify-around items-center fixed z-10 ${
           isScrolled ? "h-14 shadow-lg" : "h-12"
         }`}
       >

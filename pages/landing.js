@@ -19,7 +19,7 @@ export default function LandingPage() {
             voluptatibus repellendus est? Quisquam provident magnam modi nemo
             recusandae odit dolorem illum! Quo?
           </div>
-          <Link href="/signin">
+          <Link href="/auth">
             <a className="btn"> Get Started </a>
           </Link>
         </div>

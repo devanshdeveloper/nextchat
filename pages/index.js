@@ -1,27 +1,35 @@
 import Head from "next/head";
 import { createRef, useEffect, useState } from "react";
-import { Loader, TodoList } from "../components";
-import { addTodo, onTodos } from "../firebase";
+import { Alert, FormInput, Loader, MessageList } from "../components";
+import { addMessage, onMessages } from "../firebase";
 
 export default function Home() {
-  // hooks
-  const titleRef = createRef();
+  // input refs
+  const messageRef = createRef();
 
   // state
-  const [todos, setTodos] = useState({});
+  const [messages, setMessages] = useState({});
   const [loading, setLoading] = useState(true);
+  const [alert, setAlert] = useState({ message: "", type: "" });
 
   // functions
   function handleSubmit(e) {
     e.preventDefault();
-    const title = titleRef.current.value;
-    titleRef.current.value = "";
-    addTodo({ title, completed: false });
+    const text = messageRef.current.value;
+    if (!text) return;
+    messageRef.current.value = "";
+    addMessage(text).catch((e) => {
+      console.log(e);
+    });
+  }
+
+  function handleError(e) {
+    setAlert({ message: interpretError(e.code), type: "error" });
   }
 
   useEffect(() => {
-    return onTodos((s) => {
-      if (s.exists()) setTodos(s.val());
+    return onMessages((s) => {
+      if (s.exists()) setMessages(s.val());
       setLoading(false);
     });
   }, []);
@@ -29,22 +37,24 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Home | Noter</title>
+        <title>Group Message</title>
       </Head>
       <div>
-        <h1 className="ml-3 pt-2 text-xl">Todos</h1>
-        <TodoList todosData={todos}>
-          <form onSubmit={handleSubmit}>
-            <input
-              className="w-full h-full"
-              ref={titleRef}
-              type="text"
-              name="todo"
-              placeholder="Add a todo"
-            />
-          </form>
-        </TodoList>
+        <Alert {...alert} />
+        <MessageList messageData={messages} />
+        <div className="h-14"></div>
       </div>
+      <form
+        onSubmit={handleSubmit}
+        className="fixed bottom-0 left-0 w-full h-14 gap-3 bg-white flex items-center justify-center"
+      >
+        <FormInput
+          type="text"
+          ref={messageRef}
+          className="w-[min(60vw,600px)]"
+        />
+        <button className="btn">Send</button>
+      </form>
       <Loader loading={loading} />
     </>
   );

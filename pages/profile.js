@@ -1,7 +1,7 @@
 import { useAuth } from "../context";
 import { Alert, FormInput, Loader } from "../components";
 import { createRef, useState } from "react";
-import { updateUser } from "../firebase";
+import { updateUser, uploadUserPhoto } from "../firebase";
 import { interpretError } from "../utilities";
 import Head from "next/head";
 
@@ -29,6 +29,17 @@ export default function Profile() {
       .finally(() => setLoading(false));
   }
 
+  function handlePhotoUpload(e) {
+    setLoading(true);
+    uploadUserPhoto(e.target.files[0])
+      .then(() =>
+        setAlert({ message: "Profile photo updated", type: "success" })
+      )
+      .catch((e) => {
+        setAlert({ message: interpretError(e.code), type: "error" });
+      });
+  }
+
   return (
     <>
       <Head>
@@ -36,9 +47,10 @@ export default function Profile() {
       </Head>
       <div className="flex h-60 items-center justify-center">
         <img
-          src={user.photoURL}
+          src={user?.photoURL}
           className="rounded-full w-[min(150px,50vw)] "
         />
+        <input type="file" onChange={handlePhotoUpload} />
       </div>
       <div className="bg-white lg:w-1/3 md:w-2/3 w-10/12 rounded-md mx-auto">
         <form
@@ -52,7 +64,7 @@ export default function Profile() {
             id="displayName"
             name="displayName"
             type="text"
-            defaultValue={user.displayName}
+            defaultValue={user?.displayName}
           />
           <FormInput
             ref={emailRef}
@@ -60,7 +72,7 @@ export default function Profile() {
             id="email"
             name="email"
             type="email"
-            defaultValue={user.email}
+            defaultValue={user?.email}
           />
           <input type="submit" value="Save" className="btn" />
         </form>

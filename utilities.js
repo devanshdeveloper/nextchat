@@ -1,4 +1,5 @@
 export function interpretError(e) {
+  if (!e) return "";
   return capitalize(e.slice(e.indexOf("/") + 1).replaceAll("-", " "));
 }
 
@@ -25,9 +26,29 @@ function capitalize(string) {
   });
 }
 
+const pad = (e) => (e > 9 ? `${e}` : `0${e}`);
+
 export function getFormattedDate(date) {
   const d = new Date(date);
   return `${weeks[d.getDay()]}, ${d.getDate()} ${
     months[d.getMonth()]
   } ${d.getFullYear()}`;
+}
+
+export function getFormattedTime(time) {
+  const d = new Date(time);
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+const messages = [
+  "Just Joined",
+  "Just Joined With Fuckin Ass",
+  "Entered The Room",
+  "Hi",
+  "Mai Agaya",
+  "Mera Suagat Karo",
+  "Mene Kuch Nahi Pada",
+];
+export function randomMessage() {
+  return messages[Math.floor(Math.random() * messages.length)];
 }
