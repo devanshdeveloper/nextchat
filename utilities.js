@@ -42,7 +42,7 @@ export function getFormattedTime(time) {
 
 const messages = [
   "Just Joined",
-  "Just Joined With Fuckin Ass",
+  "Just Joined Here",
   "Entered The Room",
   "Hi",
   "Mai Agaya",
