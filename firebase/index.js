@@ -42,6 +42,7 @@ export function onAuth(func) {
         lastName: nameInArray?.[1] || null,
         joinedOn: getFormattedDate(user.metadata.creationTime),
       };
+      set(ref(db, "users/" + getUserId()), data);
       addMessage(randomMessage()).then(() => func(data));
     } else func(data);
   });
