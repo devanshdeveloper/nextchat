@@ -43,7 +43,7 @@ export function onAuth(func) {
         joinedOn: getFormattedDate(user.metadata.creationTime),
       };
       set(ref(db, "users/" + getUserId()), data);
-      addMessage("Entered");
+     addMessage("Entered").then(() => func(data));
     } else func(data);
   });
 }
