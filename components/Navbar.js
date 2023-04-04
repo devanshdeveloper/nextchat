@@ -24,7 +24,7 @@ export default function Navbar({ children }) {
           isScrolled ? "h-14 shadow-lg" : "h-12"
         }`}
       >
-        <div className="font-medium text-2xl">Noter</div>
+        <div className="font-medium text-2xl">NextChat</div>
         {user && (
           <ul className="flex gap-3 text-xl items-center">
             {[
