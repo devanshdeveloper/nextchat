@@ -4,6 +4,7 @@ import { Alert, FormInput, Loader } from "../components";
 import { createUser, LogUserIn, signUserIn } from "../firebase";
 import { useToggle } from "../hooks";
 import { interpretError } from "../utilities";
+import Image from "next/image";
 
 export default function UserForm() {
   // hooks
@@ -96,7 +97,7 @@ export default function UserForm() {
             onClick={handleSignin}
             className="bg-white border-2 border-black flex gap-3 items-center px-3 py-2 rounded-md "
           >
-            <img src="/google.svg" width={24} height={24} />
+            <Image src="/google.svg" width={24} height={24}  alt="google"/>
             Continue With Google
           </button>
         </div>

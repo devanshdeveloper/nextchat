@@ -1,61 +1,83 @@
 import Head from "next/head";
-import { createRef, useEffect, useState } from "react";
-import { Alert, FormInput, Loader, MessageList } from "../components";
-import { addMessage, onMessages } from "../firebase";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { createRoom, getRoomNamesForUser } from "../firebase";
+import { FormInput } from "../components";
+import { useRouter } from "next/router";
 
 export default function Home() {
-  // input refs
-  const messageRef = createRef();
+  // hooks
+  const router = useRouter();
 
   // state
-  const [messages, setMessages] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [alert, setAlert] = useState({ message: "", type: "" });
-
-  // functions
-  function handleSubmit(e) {
-    e.preventDefault();
-    const text = messageRef.current.value;
-    if (!text) return;
-    messageRef.current.value = "";
-    addMessage(text).catch((e) => {
-      console.log(e);
-    });
-  }
-
-  function handleError(e) {
-    setAlert({ message: interpretError(e.code), type: "error" });
-  }
+  const [rooms, setRooms] = useState(null);
 
   useEffect(() => {
-    return onMessages((s) => {
-      if (s.exists()) setMessages(s.val());
-      setLoading(false);
+    getRoomNamesForUser().then((r) => {
+      setRooms(r);
+      console.log(r);
     });
   }, []);
+
+  async function handleCreate(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const name = formData.get("name");
+    const roomId = await createRoom(name);
+    router.push(`/room/${roomId}`);
+  }
+
+  async function handleJoin(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const roomId = formData.get("roomId");
+    router.push(`/room/${roomId}`);
+  }
 
   return (
     <>
       <Head>
-        <title>Group Message</title>
+        <title>Rooms</title>
       </Head>
-      <div>
-        <Alert {...alert} />
-        <MessageList messageData={messages} />
-        <div className="h-14"></div>
+      <div className="flex flex-col items-center gap-5 pt-20">
+        <div className="text-2xl font-bold">Joined Rooms</div>
+        <div className="space-y-5 w-[min(500px,80vw)]">
+          {rooms &&
+            rooms.map((room) => (
+              <Link
+                key={room.id}
+                className="bg-white px-4 py-2 block rounded-md text-center
+                w-full"
+                href={`/room/${room.id}`}
+              >
+                {room.name}
+              </Link>
+            ))}
+        </div>
+        <div className="font-bold text-xl">OR</div>
+        <form onSubmit={handleCreate} className="bg-white p-10 rounded-md">
+          <FormInput id="nameInput" labelText="Name" type="text" name="name" />
+          <input
+            type="submit"
+            className="btn block mx-auto"
+            value="Create Room"
+          />
+        </form>
+        <div className="font-bold text-xl">OR</div>
+        <form onSubmit={handleJoin} className="bg-white p-10 rounded-lg">
+          <FormInput
+            id="nameInput"
+            labelText="Room ID"
+            type="text"
+            name="roomId"
+          />
+          <input
+            type="submit"
+            className="btn block mx-auto"
+            value="Join Room"
+          />
+        </form>
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className="fixed bottom-0 left-0 w-full h-14 gap-3 bg-white flex items-center justify-center"
-      >
-        <FormInput
-          type="text"
-          ref={messageRef}
-          className="w-[min(60vw,600px)]"
-        />
-        <button className="btn">Send</button>
-      </form>
-      <Loader loading={loading} />
     </>
   );
 }

@@ -3,26 +3,16 @@ import { useState } from "react";
 import { useAuth } from "../context";
 import { signUserOut } from "../firebase";
 import { useEventListener } from "../hooks";
+import Image from "next/image";
 
 export default function Navbar({ children }) {
   // hooks
   const { user } = useAuth();
 
-  // state
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  // events
-  useEventListener("scroll", () => {
-    const isTop = window.scrollY > 100;
-    if (isTop !== isScrolled) setIsScrolled(isTop);
-  });
-
   return (
     <>
       <nav
-        className={`w-screen bg-white flex justify-around items-center fixed z-10 ${
-          isScrolled ? "h-14 shadow-lg" : "h-12"
-        }`}
+        className={`w-screen bg-white flex justify-around items-center fixed z-10 h-16`}
       >
         <div className="font-medium text-2xl">NextChat</div>
         {user && (
@@ -32,13 +22,17 @@ export default function Navbar({ children }) {
               ["Profile", "/profile"],
             ].map(([text, href], i) => (
               <li key={i}>
-                <Link href={href}>
-                  <a>{text}</a>
-                </Link>
+                <Link href={href}>{text}</Link>
               </li>
             ))}
             <li>
-              <img src={user?.photoURL} className="rounded-full w-8" />
+              <Image
+                src={user?.photoURL}
+                width={50}
+                height={50}
+                alt={"profile"}
+                className="rounded-full w-8"
+              />
             </li>
             <li>
               <button className="btn" onClick={signUserOut}>
@@ -48,15 +42,7 @@ export default function Navbar({ children }) {
           </ul>
         )}
       </nav>
-      <div
-        className={`w-screen relative  ${
-          isScrolled
-            ? "h-[calc(100vh-56px)] top-14"
-            : "h-[calc(100vh-48px)] top-12"
-        }`}
-      >
-        {children}
-      </div>
+      {children}
     </>
   );
 }

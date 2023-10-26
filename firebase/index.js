@@ -13,8 +13,16 @@ import {
   updateEmail,
   updateProfile,
 } from "firebase/auth";
-import { getDatabase, onValue, push, ref, set } from "firebase/database";
-import { getFormattedDate, randomMessage } from "../utilities";
+import {
+  get,
+  getDatabase,
+  onValue,
+  push,
+  ref,
+  runTransaction,
+  set,
+} from "firebase/database";
+import { getFormattedDate } from "../utilities";
 const app = initializeApp({
   apiKey: "AIzaSyC5yhbGuHEUQUkqGhqy8QDtQfhiC4wCRrg",
   authDomain: "noter-fcd0d.firebaseapp.com",
@@ -42,8 +50,9 @@ export function onAuth(func) {
         lastName: nameInArray?.[1] || null,
         joinedOn: getFormattedDate(user.metadata.creationTime),
       };
-      set(ref(db, "users/" + getUserId()), data);
-     addMessage("Entered").then(() => func(data));
+      runTransaction(ref(db, "users/" + getUserId()), (currentData) => {
+        return currentData ? currentData : data;
+      }).then(() => func(data));
     } else func(data);
   });
 }
@@ -85,10 +94,82 @@ export function getUserId() {
   return getUser()?.uid;
 }
 
-console.log(db);
+import { v4 as uuidv4 } from "uuid";
 
-export function addMessage(text) {
-  return set(push(ref(db, `messages`)), {
+export async function createRoom(name) {
+  const roomId = uuidv4(); // Generate a unique room ID
+  const roomRef = ref(db, `rooms/${roomId}`);
+  await set(roomRef, { name, id: roomId });
+  await joinRoom(roomId);
+  return roomId;
+}
+
+export async function joinRoom(roomId) {
+  const userRoomsRef = ref(db, `users/${getUserId()}/rooms`);
+
+  try {
+    await runTransaction(userRoomsRef, (userRooms) => {
+      if (!userRooms) {
+        userRooms = [roomId];
+      } else if (!userRooms.includes(roomId)) {
+        userRooms.push(roomId);
+      }
+      return userRooms;
+    });
+  } catch (error) {
+    console.error("Error joining room:", error);
+    throw error;
+  }
+}
+
+export function onRoom(roomId, then) {
+  return onValue(ref(db, `rooms/${roomId}`), then);
+}
+
+export async function getRoomNamesForUser() {
+  const rooms = await getRooms(getUserId());
+  const roomNames = [];
+
+  for (const room of rooms) {
+    const roomId = room;
+    console.log(roomId);
+    try {
+      const roomRef = ref(db, `rooms/${roomId}`);
+      const roomSnapshot = await get(roomRef);
+
+      if (roomSnapshot.exists()) {
+        const roomData = roomSnapshot.val();
+        roomNames.push({ id: roomId, name: roomData.name });
+      } else {
+        roomNames.push({ id: roomId, name: "Room Not Found" });
+      }
+    } catch (error) {
+      console.error(`Error getting room with ID ${roomId}:`, error);
+      roomNames.push({ id: roomId, name: "Error" });
+    }
+  }
+
+  return roomNames;
+}
+
+async function getRooms(userId) {
+  try {
+    const roomsRef = ref(db, `users/${userId}/rooms`);
+    const roomsSnapshot = await get(roomsRef);
+    if (roomsSnapshot.exists()) {
+      return Object.values(roomsSnapshot.val());
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error getting rooms:", error);
+    throw error;
+  }
+}
+
+export function sendMessage(roomId, text) {
+  const messageRef = push(ref(db, `rooms/${roomId}/messages`));
+  return set(messageRef, {
     text,
     uid: getUserId(),
     photoURL: getUser().photoURL || defaultPhotoURL,
@@ -97,9 +178,19 @@ export function addMessage(text) {
   });
 }
 
-export function onMessages(then) {
-  return onValue(ref(db, `messages`), then);
-}
+// export function addMessage(text) {
+//   return set(push(ref(db, `messages`)), {
+//     text,
+//     uid: getUserId(),
+//     photoURL: getUser().photoURL || defaultPhotoURL,
+//     displayName: getUser().displayName,
+//     timestamp: Date.now(),
+//   });
+// }
+
+// export function onMessages(then) {
+//   return onValue(ref(db, `messages`), then);
+// }
 // export function addTodo(data) {
 //   return set(push(ref(db, `users/${getUserId()}/todos`)), data);
 // }
@@ -114,21 +205,21 @@ export function onMessages(then) {
 // }
 // storage
 
-export function uploadFile(path, file) {
-  return new Promise((resolve, reject) => {
-    uploadBytes(storageRef(storage, path), file)
-      .then((s) => resolve(s.downloadURL))
-      .catch(reject);
-  });
-}
+// export function uploadFile(path, file) {
+//   return new Promise((resolve, reject) => {
+//     uploadBytes(storageRef(storage, path), file)
+//       .then((s) => resolve(s.downloadURL))
+//       .catch(reject);
+//   });
+// }
 
-export function uploadUserPhoto(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) reject({ code: "storage/invalid-file" });
-    uploadFile(`users/${getUserId()}/profile`, file)
-      .then((url) =>
-        updateProfile(getUser(), { photoURL: url }).then(resolve).catch(reject)
-      )
-      .catch(reject);
-  });
-}
+// export function uploadUserPhoto(file) {
+//   return new Promise((resolve, reject) => {
+//     if (!file) reject({ code: "storage/invalid-file" });
+//     uploadFile(`users/${getUserId()}/profile`, file)
+//       .then((url) =>
+//         updateProfile(getUser(), { photoURL: url }).then(resolve).catch(reject)
+//       )
+//       .catch(reject);
+//   });
+// }

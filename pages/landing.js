@@ -14,11 +14,10 @@ export default function LandingPage() {
             <span className="font-bold">NextChat</span> is a simple, easy-to-use
           </div>
           <div className="lg:text-xl sm:text-lg mb-4 mt-2">
-          Say hello to a faster and more convenient way to stay in touch. Register now and unlock the full potential of our chat app.
+            Say hello to a faster and more convenient way to stay in touch.
+            Register now and unlock the full potential of our chat app.
           </div>
-          <Link href="/auth">
-            <a className="btn">Register</a>
-          </Link>
+          <Link href="/auth" className="btn">Register</Link>
         </div>
         <div className="lg:block s:hidden">
           <Image

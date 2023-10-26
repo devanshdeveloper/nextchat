@@ -1,10 +1,13 @@
+import Image from "next/image";
 import { getUserId } from "../firebase";
 import { getFormattedTime } from "../utilities";
 
 export default function MessageList({ messageData }) {
   const values = messageData && Object.values(messageData);
+
+  console.log(values);
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="flex flex-col gap-3 m-3">
       {values &&
         values.map(({ text, uid, photoURL, displayName, timestamp }, i) => {
           return (
@@ -14,7 +17,13 @@ export default function MessageList({ messageData }) {
                 uid === getUserId() ? "self-end" : ""
               }`}
             >
-              <img className="rounded-full w-10" src={photoURL} />
+              <Image
+                src={photoURL}
+                width={50}
+                height={50}
+                alt={"profile"}
+                className="rounded-full w-8"
+              />
               <div className="w-full">
                 <div>{displayName}</div>
                 <div className="flex justify-between">
