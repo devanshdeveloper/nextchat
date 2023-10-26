@@ -44,7 +44,7 @@ export default function AddTodo() {
           </form>
         </div>
       </div>
-      <Loader loading={loading} />
+      {loading && <Loader/>}
     </>
   );
 }

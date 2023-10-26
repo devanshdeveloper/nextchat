@@ -102,7 +102,7 @@ export default function UserForm() {
           </button>
         </div>
       </div>
-      <Loader loading={loading} />
+      {loading && <Loader/>}
     </>
   );
 }

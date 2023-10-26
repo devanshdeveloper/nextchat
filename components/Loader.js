@@ -1,13 +1,33 @@
-export default function Loader({ loading, full }) {
-  return loading ? (
+export default function Loader({
+  height = "100vh",
+  width = "100vw",
+}) {
+  return (
     <div
-      className={`w-screen absolute left-0 top-0 bg-white flex items-center justify-center ${
-        full ? "h-screen" : "h-[calc(100vh-48px)]"
-      }`}
+      className="absolute z-[100] flex items-center justify-center bg-dark-700"
+      style={{ height, width }}
     >
-      <div className="border-4 border-t-0 border-black animate-spin inline-block w-8 h-8 rounded-full">
-        <div className="invisible">Loading...</div>
-      </div>
+      <Spinner />
     </div>
-  ) : null;
+  );
+}
+
+export function Spinner() {
+  return (
+    <svg
+      width="48"
+      height="48"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="animate-spin"
+    >
+      <path
+        d="M23 12C23 18.0751 18.0751 23 12 23"
+        stroke="#000"
+        strokeWidth="2"
+        strokeLinecap="round"
+      ></path>
+    </svg>
+  );
 }

@@ -132,7 +132,6 @@ export async function getRoomNamesForUser() {
 
   for (const room of rooms) {
     const roomId = room;
-    console.log(roomId);
     try {
       const roomRef = ref(db, `rooms/${roomId}`);
       const roomSnapshot = await get(roomRef);
@@ -150,6 +149,27 @@ export async function getRoomNamesForUser() {
   }
 
   return roomNames;
+}
+
+export async function exitRoom(roomId) {
+  const userRoomsRef = ref(db, `users/${getUserId()}/rooms`);
+
+  console.log(userRoomsRef);
+  try {
+    await runTransaction(userRoomsRef, (userRooms) => {
+      console.log(userRooms);
+      if (userRooms) {
+        const index = userRooms.findIndex((e) => e.id === roomId);
+        if (index !== -1) {
+          userRooms.splice(index, 1);
+        }
+        return userRooms;
+      }
+    });
+  } catch (error) {
+    console.error("Error exiting room:", error);
+    throw error;
+  }
 }
 
 async function getRooms(userId) {

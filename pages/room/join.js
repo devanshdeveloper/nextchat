@@ -14,11 +14,10 @@ export default function RoomForm() {
   const [alert, setAlert] = useState({ message: "", type: "" });
 
   // handlers
-  async function handleSubmit(e) {
+  async function handleJoin(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const name = formData.get("name");
-    const roomId = await createRoom(name);
+    const roomId = formData.get("roomId");
     router.push(`/room/${roomId}`);
   }
 
@@ -31,19 +30,19 @@ export default function RoomForm() {
         <div className="w-[min(80vw,400px)] bg-white rounded-lg shadow-lg flex items-center justify-evenly flex-col p-4 gap-4">
           <h1 className="text-2xl">Create Room</h1>
           <Alert {...alert} />
-          <form onSubmit={handleSubmit}>
-            <FormInput
-              id="nameInput"
-              labelText="Name"
-              type="text"
-              name="name"
-            />
-            <input
-              type="submit"
-              className="btn block mx-auto"
-              value="Create Room"
-            />
-          </form>
+          <form onSubmit={handleJoin}>
+          <FormInput
+            id="nameInput"
+            labelText="Room ID"
+            type="text"
+            name="roomId"
+          />
+          <input
+            type="submit"
+            className="btn block mx-auto"
+            value="Join Room"
+          />
+        </form>
         </div>
       </div>
       {loading && <Loader/>}

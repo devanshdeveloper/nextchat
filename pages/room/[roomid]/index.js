@@ -1,10 +1,12 @@
 import Head from "next/head";
 import { createRef, useEffect, useRef, useState } from "react";
 import { Alert, FormInput, Loader, MessageList } from "../../../components";
-import { joinRoom, onRoom, sendMessage } from "../../../firebase";
+import { exitRoom, joinRoom, onRoom, sendMessage } from "../../../firebase";
 import { useRouter } from "next/router";
+import Link from "next/link";
+import Modal from "../../../components/Modal";
 
-export default function Home() {
+export default function RoomPage() {
   // hooks
   const router = useRouter();
   const roomId = router.query.roomid;
@@ -14,6 +16,7 @@ export default function Home() {
   const lastMessageRef = useRef();
 
   // state
+  const [modal, setModal] = useState();
   const [room, setRoom] = useState({});
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState({ message: "", type: "" });
@@ -31,6 +34,11 @@ export default function Home() {
     setAlert({ message: interpretError(e.code), type: "error" });
   }
 
+ async function handleExitRoom() {
+   await exitRoom(roomId)
+   router.push("/")
+  }
+
   useEffect(() => {
     joinRoom(roomId);
     return onRoom(roomId, (s) => {
@@ -46,9 +54,14 @@ export default function Home() {
         <title>Group Message</title>
       </Head>
       <div className="pt-16">
+        <Modal show={modal} setModal={setModal} text={`${room.name} | settings`}>
+          <button onClick={handleExitRoom} className="btn">
+            Exit Room
+          </button>
+        </Modal>
         <Alert {...alert} />
         <div className="h-16 text-2xl w-full fixed bg-white flex items-center justify-center border-t-2">
-          {room.name}
+          <button onClick={() => setModal(true)}>{room.name}</button>
         </div>
         <div className="h-20"></div>
         <MessageList messageData={room.messages} />
@@ -65,7 +78,7 @@ export default function Home() {
         />
         <button className="btn">Send</button>
       </form>
-      <Loader loading={loading} />
+      {loading && <Loader />}
     </>
   );
 }

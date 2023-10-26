@@ -25,7 +25,7 @@ export default function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ user }}>
-      {loading ? <Loader loading={loading} full /> : children}
+      {loading ? <Loader /> : children}
     </AuthContext.Provider>
   );
 }

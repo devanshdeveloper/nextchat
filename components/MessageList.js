@@ -4,8 +4,6 @@ import { getFormattedTime } from "../utilities";
 
 export default function MessageList({ messageData }) {
   const values = messageData && Object.values(messageData);
-
-  console.log(values);
   return (
     <div className="flex flex-col gap-3 m-3">
       {values &&

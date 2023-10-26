@@ -4,6 +4,7 @@ import { createRef, useState } from "react";
 import { updateUser, uploadUserPhoto } from "../firebase";
 import { interpretError } from "../utilities";
 import Head from "next/head";
+import Image from "next/image";
 
 export default function Profile() {
   // input refs
@@ -46,9 +47,12 @@ export default function Profile() {
         <title>Profile | Noter</title>
       </Head>
       <div className="flex h-60 items-center justify-center">
-        <img
+        <Image
           src={user?.photoURL}
-          className="rounded-full w-[min(150px,50vw)] "
+          className="rounded-full w-[min(150px,50vw)]"
+          height={200}
+          width={200}
+          alt="Profile"
         />
         <input type="file" onChange={handlePhotoUpload} />
       </div>

@@ -15,7 +15,6 @@ export default function Home() {
   useEffect(() => {
     getRoomNamesForUser().then((r) => {
       setRooms(r);
-      console.log(r);
     });
   }, []);
 
@@ -27,19 +26,20 @@ export default function Home() {
     router.push(`/room/${roomId}`);
   }
 
-  async function handleJoin(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const roomId = formData.get("roomId");
-    router.push(`/room/${roomId}`);
-  }
-
   return (
     <>
       <Head>
         <title>Rooms</title>
       </Head>
       <div className="flex flex-col items-center gap-5 pt-20">
+        <div className="flex gap-5">
+          <Link href="/room/create" className="btn">
+            Create Room
+          </Link>
+          <Link href="/room/join" className="btn">
+            Join Room
+          </Link>
+        </div>
         <div className="text-2xl font-bold">Joined Rooms</div>
         <div className="space-y-5 w-[min(500px,80vw)]">
           {rooms &&
@@ -54,29 +54,6 @@ export default function Home() {
               </Link>
             ))}
         </div>
-        <div className="font-bold text-xl">OR</div>
-        <form onSubmit={handleCreate} className="bg-white p-10 rounded-md">
-          <FormInput id="nameInput" labelText="Name" type="text" name="name" />
-          <input
-            type="submit"
-            className="btn block mx-auto"
-            value="Create Room"
-          />
-        </form>
-        <div className="font-bold text-xl">OR</div>
-        <form onSubmit={handleJoin} className="bg-white p-10 rounded-lg">
-          <FormInput
-            id="nameInput"
-            labelText="Room ID"
-            type="text"
-            name="roomId"
-          />
-          <input
-            type="submit"
-            className="btn block mx-auto"
-            value="Join Room"
-          />
-        </form>
       </div>
     </>
   );
