@@ -8,7 +8,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithRedirect,
+  signInWithPopup,
   signOut,
   updateEmail,
   updateProfile,
@@ -79,7 +79,7 @@ export function updateUser(displayName, email) {
 }
 
 export function signUserIn() {
-  return signInWithRedirect(auth, new GoogleAuthProvider());
+  return signInWithPopup(auth, new GoogleAuthProvider());
 }
 export function signUserOut() {
   return signOut(auth);
@@ -88,7 +88,7 @@ export function LogUserIn(email, pass) {
   return signInWithEmailAndPassword(auth, email, pass);
 }
 export function getUser() {
-  return auth.currentUser;
+  return auth.currentUser;``
 }
 export function getUserId() {
   return getUser()?.uid;

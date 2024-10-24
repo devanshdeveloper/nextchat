@@ -26,7 +26,7 @@ export default function Navbar({ children }) {
               </li>
             ))}
             <li>
-              <Image
+              <img
                 src={user?.photoURL}
                 width={50}
                 height={50}

@@ -38,8 +38,11 @@ export default function UserForm() {
     setAlert({ message: interpretError(e.code), type: "error" });
   }
 
-  function handleSignin() {
-    signUserIn().catch(handleError);
+  async function handleSignin() {
+    await signUserIn().catch(handleError);
+    if (typeof window !== undefined) {
+      window.location.href = window.location.origin;
+    }
   }
 
   return (
@@ -97,12 +100,12 @@ export default function UserForm() {
             onClick={handleSignin}
             className="bg-white border-2 border-black flex gap-3 items-center px-3 py-2 rounded-md "
           >
-            <Image src="/google.svg" width={24} height={24}  alt="google"/>
+            <Image src="/google.svg" width={24} height={24} alt="google" />
             Continue With Google
           </button>
         </div>
       </div>
-      {loading && <Loader/>}
+      {loading && <Loader />}
     </>
   );
 }
